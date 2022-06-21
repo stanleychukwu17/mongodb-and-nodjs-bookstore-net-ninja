@@ -60,3 +60,32 @@ app.get('/books/:id', (req, res) => {
         res.status(500).json({'msg':'bad', 'cause': 'Invalid id received'})
     }
 })
+
+// making a post request
+app.post('/books', (req, res) => {
+    const book = req.body
+
+    db.collection('books').insertOne(book)
+    .then((result: {}) => {
+        res.status(201).json({'msg':'okay', 'book':result})
+    })
+    .catch((err: any )=> {
+        res.status(500).json({'msg':'bad', 'cause': `could not create a new document, error: ${err}`})
+    })
+})
+
+
+// making a delete request
+app.post('/books/:id', (req, res) => {
+    if (ObjectId.isValid(req.params.id)) {
+        db.collection('books').deleteOne({_id: ObjectId(req.params.id)})
+        .then((result: {}) => {
+            res.status(200).json({'msg':'okay', 'book':result})
+        })
+        .catch((err: any )=> {
+            res.status(500).json({'msg':'bad', 'cause': err})
+        })
+    } else {
+        res.status(500).json({'msg':'bad', 'cause': 'Invalid id received'})
+    }
+})
