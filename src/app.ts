@@ -1,14 +1,15 @@
 import express from "express";
+
 // import {connectToDb, getDb} from './db'
+const {ObjectId} = require('mongodb');
 const {connectToDb, getDb} = require('./db')
 
-console.log(connectToDb, getDb)
 
 // creates the react app
 const app = express();
 
 // opens connection to the database
-let db
+let db: any
 connectToDb((err: any) => {
     if (!err) {
         // now we can start listening for events
@@ -30,6 +31,32 @@ app.get('/', (req, res) => {
 })
 
 // request for all books
-app.get('/', (req, res) => {
-    res.json({'msg':'welcome to the home page'})
+app.get('/books', (req, res) => {
+    let books: {}[] = []
+
+    db.collection('books').find().limit(20).sort({author: 1})
+    .forEach((book: {}) => {
+        books.push(book)
+    })
+    .then(() => {
+        res.status(200).json({'msg':'okay', 'totalBooks':books.length, books})
+    })
+    .catch((err: any )=> {
+        res.status(500).json({'msg':'bad', 'cause': err})
+    })
+})
+
+// request for just one book
+app.get('/books/:id', (req, res) => {
+    if (ObjectId.isValid(req.params.id)) {
+        db.collection('books').findOne({_id: ObjectId(req.params.id)})
+        .then((doc: {}) => {
+            res.status(200).json({'msg':'okay', 'book':doc})
+        })
+        .catch((err: any )=> {
+            res.status(500).json({'msg':'bad', 'cause': err})
+        })
+    } else {
+        res.status(500).json({'msg':'bad', 'cause': 'Invalid id received'})
+    }
 })
