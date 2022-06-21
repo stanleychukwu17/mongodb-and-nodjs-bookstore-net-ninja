@@ -7,17 +7,6 @@ console.log(connectToDb, getDb)
 // creates the react app
 const app = express();
 
-document.querySelectorAll('.EsIlz').forEach(function(itm) {
-    console.log({
-        title: '',
-        author: '',
-        pages: Math.floor(Math.random() * 600) + 100,
-        genres: ['comedy', 'fantasy', 'horror', 'romance', 'action', 'Sci-Fi'],
-        reviews: [{}, {}]
-    })
-});
-
-
 // opens connection to the database
 let db
 connectToDb((err: any) => {
@@ -34,9 +23,13 @@ connectToDb((err: any) => {
     }
 })
 
-// connecting to the database
 
+// request to the home page
 app.get('/', (req, res) => {
-    res.json({'msg':'welcoime home'})
+    res.json({'msg':'welcome to the home page'})
 })
 
+// request for all books
+app.get('/', (req, res) => {
+    res.json({'msg':'welcome to the home page'})
+})
