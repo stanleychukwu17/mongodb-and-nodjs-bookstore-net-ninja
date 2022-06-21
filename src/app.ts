@@ -33,9 +33,14 @@ app.get('/', (req, res) => {
 
 // request for all books
 app.get('/books', (req, res) => {
-    let books: {}[] = []
+    const books: {}[] = [],
+        currentPage: number = Number(req.query.p) || 0,
+        booksPerPage: number = 5;
 
-    db.collection('books').find().limit(20).sort({author: 1})
+    db.collection('books').find()
+    .skip(booksPerPage * currentPage)
+    .limit(booksPerPage)
+    .sort({author: 1})
     .forEach((book: {}) => {
         books.push(book)
     })
