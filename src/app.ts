@@ -7,6 +7,7 @@ const {connectToDb, getDb} = require('./db')
 
 // creates the react app
 const app = express();
+app.use(express.json());
 
 // opens connection to the database
 let db: any
@@ -74,11 +75,27 @@ app.post('/books', (req, res) => {
     })
 })
 
-
 // making a delete request
-app.post('/books/:id', (req, res) => {
+app.delete('/books/:id', (req, res) => {
     if (ObjectId.isValid(req.params.id)) {
         db.collection('books').deleteOne({_id: ObjectId(req.params.id)})
+        .then((result: {}) => {
+            res.status(200).json({'msg':'okay', 'book':result})
+        })
+        .catch((err: any )=> {
+            res.status(500).json({'msg':'bad', 'cause': err})
+        })
+    } else {
+        res.status(500).json({'msg':'bad', 'cause': 'Invalid id received'})
+    }
+})
+
+// making an update request
+app.patch('/books/:id', (req, res) => {
+    const updates = req.body
+
+    if (ObjectId.isValid(req.params.id)) {
+        db.collection('books').updateOne({_id: ObjectId(req.params.id)}, {$set: updates})
         .then((result: {}) => {
             res.status(200).json({'msg':'okay', 'book':result})
         })
